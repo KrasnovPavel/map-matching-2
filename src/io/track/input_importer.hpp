@@ -16,6 +16,7 @@
 #ifndef MAP_MATCHING_2_INPUT_IMPORTER_HPP
 #define MAP_MATCHING_2_INPUT_IMPORTER_HPP
 
+#include <unordered_map>
 #include <boost/tokenizer.hpp>
 
 namespace map_matching_2::io::track {

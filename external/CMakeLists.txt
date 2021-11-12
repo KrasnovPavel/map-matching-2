@@ -99,7 +99,12 @@ if (NOT boost_POPULATED)
 endif ()
 
 if (NOT EXISTS "${boost_SOURCE_DIR}/b2")
-    execute_process(COMMAND ./bootstrap.sh --prefix="${boost_BINARY_DIR}"
+    IF (WIN32)
+        set(_bootstrap_path ${boost_SOURCE_DIR}/bootstrap.bat)
+    ELSE()
+        set(_bootstrap_path ${boost_SOURCE_DIR}/bootstrap.sh)
+    ENDIF()
+    execute_process(COMMAND ${_bootstrap_path} --prefix=${boost_BINARY_DIR}
             WORKING_DIRECTORY "${boost_SOURCE_DIR}")
 endif ()
 
@@ -117,11 +122,11 @@ if (NOT Boost_FOUND)
     message(STATUS "Set boost variant to ${_variant}")
 
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set(_toolset "gcc")
+        set(_toolset "toolset=gcc")
     endif ()
-    message(STATUS "Set boost toolset to ${_toolset}")
+    message(STATUS "Set boost ${_toolset}")
 
-    execute_process(COMMAND ./b2 install link=shared threading=multi variant=release toolset=${_toolset}
+    execute_process(COMMAND ./b2 install link=shared threading=multi variant=release ${_toolset} --without-python --prefix=${boost_BINARY_DIR}
             WORKING_DIRECTORY "${boost_SOURCE_DIR}")
 endif ()
 
