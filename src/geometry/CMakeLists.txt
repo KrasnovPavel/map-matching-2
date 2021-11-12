@@ -1,7 +1,9 @@
 find_package(Boost REQUIRED COMPONENTS graph)
 
-list(APPEND CMAKE_MODULE_PATH "${OSMIUM_INCLUDE_DIR}/cmake")
-find_package(Osmium REQUIRED COMPONENTS io proj)
+if (NOT ${CMAKE_TOOLCHAIN_FILE} MATCHES "vcpkg.cmake$")
+    list(APPEND CMAKE_MODULE_PATH "${OSMIUM_INCLUDE_DIR}/cmake")
+    find_package(Osmium REQUIRED COMPONENTS io proj)
+endif()
 
 add_library(geometry STATIC)
 
@@ -30,15 +32,26 @@ target_include_directories(geometry
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-target_include_directories(geometry SYSTEM
-        PUBLIC
-        ${SHORTEST_POINTS_NEW_INCLUDE_DIRS}
-        ${PROTOZERO_INCLUDE_DIR}
-        ${OSMIUM_INCLUDE_DIR}/include)
 
-target_link_libraries(geometry
-        PUBLIC
-        io
-        Boost::boost
-        Boost::graph
-        ${OSMIUM_LIBRARIES})
+if (${CMAKE_TOOLCHAIN_FILE} MATCHES "vcpkg.cmake$")
+    target_include_directories(geometry SYSTEM
+            PUBLIC
+            ${SHORTEST_POINTS_NEW_INCLUDE_DIRS})
+    target_link_libraries(geometry
+            PUBLIC
+            io
+            Boost::boost
+            Boost::graph)
+else()
+    target_include_directories(geometry SYSTEM
+            PUBLIC
+            ${SHORTEST_POINTS_NEW_INCLUDE_DIRS}
+            ${PROTOZERO_INCLUDE_DIR}
+            ${OSMIUM_INCLUDE_DIR}/include)
+    target_link_libraries(geometry
+            PUBLIC
+            io
+            Boost::boost
+            Boost::graph
+            ${OSMIUM_LIBRARIES})
+endif()
